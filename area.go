@@ -26,18 +26,15 @@ func Area(start, end time.Time, points []Point) int64 {
 	sort.Slice(points, func(i, j int) bool {
 		return points[i].Timestamp.Before(points[j].Timestamp)
 	})
-	squares := []square{}
-	for i := range points {
-		if i == len(points)-1 {
-			break
+
+	if len(points) == 1 {
+		virtualPoint := Point{
+			Timestamp: end,
+			Value:     points[0].Value,
 		}
-		s := square{
-			start: points[i].Timestamp,
-			end:   points[i+1].Timestamp,
-			value: points[i].Value,
-		}
-		squares = append(squares, s)
+		points = append(points, virtualPoint)
 	}
+	squares := squaresOf(points)
 	var area int64
 	for _, s := range squares {
 		if s.end.Before(start) {
@@ -50,6 +47,22 @@ func Area(start, end time.Time, points []Point) int64 {
 	}
 
 	return area
+}
+
+func squaresOf(points []Point) []square {
+	squares := []square{}
+	for i := range points {
+		if i == len(points)-1 {
+			break
+		}
+		s := square{
+			start: points[i].Timestamp,
+			end:   points[i+1].Timestamp,
+			value: points[i].Value,
+		}
+		squares = append(squares, s)
+	}
+	return squares
 }
 
 // areaOf calculates the area of a square between start and end

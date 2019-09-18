@@ -88,6 +88,24 @@ func TestArea(t *testing.T) {
 			},
 			want: int64(0),
 		},
+		{
+			name:  "one points inside the timewindow",
+			start: now,
+			end:   now.Add(10 * time.Second),
+			points: []Point{
+				{Timestamp: now.Add(5 * time.Second), Value: 100}, // 5 * 100
+			},
+			want: int64(500),
+		},
+		{
+			name:  "one points before the timewindow",
+			start: now,
+			end:   now.Add(10 * time.Second),
+			points: []Point{
+				{Timestamp: now.Add(-5 * time.Second), Value: 100}, // 10 * 100
+			},
+			want: int64(1000),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
